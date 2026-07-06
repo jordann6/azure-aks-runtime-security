@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1400" height="860" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="aksGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#EAF3FB"/>
+      <stop offset="100%" stop-color="#D6E8F7"/>
+    </linearGradient>
+    <marker id="aBlue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#0078D4"/>
+    </marker>
+    <marker id="aAmber" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#FFB900"/>
+    </marker>
+    <marker id="aTeal" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#008272"/>
+    </marker>
+    <marker id="aRed" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#D13438"/>
+    </marker>
+  </defs>
+
+  <rect width="1400" height="860" fill="#FFFFFF"/>
+
+  <!-- Title -->
+  <text x="700" y="42" font-family="Arial, sans-serif" font-size="27" font-weight="bold" text-anchor="middle" fill="#243A5E">
+    Azure AKS Runtime Security - Defense in Depth
+  </text>
+
+  <!-- Legend -->
+  <g transform="translate(50, 66)">
+    <text x="0" y="0" font-family="Arial" font-size="13" font-weight="bold" fill="#243A5E">Legend:</text>
+    <line x1="0" y1="14" x2="46" y2="14" stroke="#0078D4" stroke-width="3" marker-end="url(#aBlue)"/>
+    <text x="54" y="18" font-family="Arial" font-size="12" fill="#243A5E">Admission (Prevent)</text>
+    <line x1="210" y1="14" x2="256" y2="14" stroke="#FFB900" stroke-width="3" marker-end="url(#aAmber)"/>
+    <text x="264" y="18" font-family="Arial" font-size="12" fill="#243A5E">Runtime (Detect)</text>
+    <line x1="400" y1="14" x2="446" y2="14" stroke="#008272" stroke-width="3" marker-end="url(#aTeal)"/>
+    <text x="454" y="18" font-family="Arial" font-size="12" fill="#243A5E">Cloud (Defender)</text>
+    <line x1="600" y1="14" x2="646" y2="14" stroke="#D13438" stroke-width="3" stroke-dasharray="8,4" marker-end="url(#aRed)"/>
+    <text x="654" y="18" font-family="Arial" font-size="12" fill="#243A5E">Blocked / Attack</text>
+  </g>
+
+  <!-- kubectl apply -->
+  <g transform="translate(140, 300)">
+    <rect x="-70" y="-45" width="140" height="90" rx="8" fill="#EEF1F5" stroke="#243A5E" stroke-width="2"/>
+    <text x="0" y="-8" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#243A5E">kubectl</text>
+    <text x="0" y="12" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#243A5E">apply</text>
+    <text x="0" y="32" font-family="Arial" font-size="10" text-anchor="middle" fill="#666">pod create</text>
+  </g>
+
+  <!-- Kyverno admission -->
+  <g transform="translate(400, 300)">
+    <rect x="-95" y="-60" width="190" height="120" rx="8" fill="#FFFFFF" stroke="#0078D4" stroke-width="3"/>
+    <text x="0" y="-30" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#0078D4">Kyverno</text>
+    <text x="0" y="-11" font-family="Arial" font-size="11" text-anchor="middle" fill="#666">Admission Webhook</text>
+    <line x1="-80" y1="0" x2="80" y2="0" stroke="#E0E0E0" stroke-width="1"/>
+    <text x="0" y="18" font-family="Arial" font-size="10" text-anchor="middle" fill="#243A5E">4 Enforce policies:</text>
+    <text x="0" y="34" font-family="Arial" font-size="9" text-anchor="middle" fill="#666">privileged · hostPath</text>
+    <text x="0" y="47" font-family="Arial" font-size="9" text-anchor="middle" fill="#666">host-ns · runAsNonRoot</text>
+  </g>
+
+  <!-- Blocked (unsafe pod) -->
+  <g transform="translate(400, 110)">
+    <rect x="-95" y="-42" width="190" height="84" rx="8" fill="#FBE9EA" stroke="#D13438" stroke-width="2"/>
+    <circle cx="-60" cy="-6" r="15" fill="#FFFFFF" stroke="#D13438" stroke-width="2"/>
+    <path d="M -67,-13 L -53,1 M -53,-13 L -67,1" stroke="#D13438" stroke-width="3"/>
+    <text x="18" y="-10" font-family="Arial" font-size="13" font-weight="bold" text-anchor="middle" fill="#D13438">DENIED</text>
+    <text x="10" y="8" font-family="Arial" font-size="9" text-anchor="middle" fill="#666">privileged / hostPath</text>
+    <text x="10" y="21" font-family="Arial" font-size="9" text-anchor="middle" fill="#666">pod rejected</text>
+  </g>
+
+  <!-- AKS cluster container -->
+  <rect x="620" y="150" width="500" height="560" rx="12" fill="url(#aksGrad)" stroke="#0078D4" stroke-width="3"/>
+  <text x="644" y="180" font-family="Arial" font-size="17" font-weight="bold" fill="#0078D4">AKS Cluster</text>
+  <text x="644" y="199" font-family="Arial" font-size="11" fill="#243A5E">OIDC issuer · workload identity · managed identity</text>
+
+  <!-- Exempt namespace + vulnerable pod -->
+  <g transform="translate(760, 300)">
+    <rect x="-95" y="-70" width="200" height="150" rx="6" fill="#FFFFFF" stroke="#B0B7C3" stroke-width="1.5" stroke-dasharray="5,4"/>
+    <text x="5" y="-52" font-family="Arial" font-size="10" font-weight="bold" text-anchor="middle" fill="#666">attack-lab (exempt ns)</text>
+    <rect x="-70" y="-34" width="150" height="96" rx="6" fill="#FBE9EA" stroke="#D13438" stroke-width="2"/>
+    <text x="5" y="-14" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle" fill="#D13438">Vulnerable Pod</text>
+    <text x="5" y="4" font-family="Arial" font-size="9" text-anchor="middle" fill="#666">shell · read secrets</text>
+    <text x="5" y="18" font-family="Arial" font-size="9" text-anchor="middle" fill="#666">escape · drop binary</text>
+    <text x="5" y="32" font-family="Arial" font-size="9" text-anchor="middle" fill="#666">IMDS credential theft</text>
+    <text x="5" y="50" font-family="Arial" font-size="9" font-style="italic" text-anchor="middle" fill="#999">5 MITRE ATT&amp;CK techniques</text>
+  </g>
+
+  <!-- Falco DaemonSet -->
+  <g transform="translate(760, 560)">
+    <rect x="-110" y="-52" width="230" height="104" rx="8" fill="#FFFFFF" stroke="#FFB900" stroke-width="3"/>
+    <text x="5" y="-28" font-family="Arial" font-size="15" font-weight="bold" text-anchor="middle" fill="#B37E00">Falco DaemonSet</text>
+    <text x="5" y="-10" font-family="Arial" font-size="10" text-anchor="middle" fill="#666">modern eBPF · every node</text>
+    <line x1="-95" y1="2" x2="110" y2="2" stroke="#E0E0E0" stroke-width="1"/>
+    <text x="5" y="20" font-family="Arial" font-size="10" text-anchor="middle" fill="#243A5E">5 MITRE-tagged rules</text>
+    <text x="5" y="36" font-family="Arial" font-size="9" text-anchor="middle" fill="#666">Container Escape = CRITICAL</text>
+  </g>
+
+  <!-- Defender for Containers -->
+  <g transform="translate(1270, 320)">
+    <rect x="-100" y="-58" width="200" height="116" rx="8" fill="#E6F4F1" stroke="#008272" stroke-width="3"/>
+    <text x="0" y="-32" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#008272">Defender for</text>
+    <text x="0" y="-14" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#008272">Containers</text>
+    <line x1="-85" y1="-2" x2="85" y2="-2" stroke="#BFE0DA" stroke-width="1"/>
+    <text x="0" y="16" font-family="Arial" font-size="9" text-anchor="middle" fill="#666">agentless image CVEs</text>
+    <text x="0" y="30" font-family="Arial" font-size="9" text-anchor="middle" fill="#666">control-plane alerts</text>
+    <text x="0" y="44" font-family="Arial" font-size="9" text-anchor="middle" fill="#666">subscription plan</text>
+  </g>
+
+  <!-- Log Analytics -->
+  <g transform="translate(1270, 560)">
+    <rect x="-100" y="-42" width="200" height="84" rx="8" fill="#FFFFFF" stroke="#243A5E" stroke-width="2"/>
+    <text x="0" y="-14" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#243A5E">Log Analytics</text>
+    <text x="0" y="4" font-family="Arial" font-size="10" text-anchor="middle" fill="#666">shared workspace</text>
+    <text x="0" y="22" font-family="Arial" font-size="9" text-anchor="middle" fill="#999">correlation + retention</text>
+  </g>
+
+  <!-- Flows -->
+  <!-- apply -> kyverno (blue) -->
+  <path d="M 210,300 L 300,300" stroke="#0078D4" stroke-width="3" fill="none" marker-end="url(#aBlue)"/>
+  <!-- kyverno -> denied (red, up) -->
+  <path d="M 400,240 L 400,152" stroke="#D13438" stroke-width="3" fill="none" stroke-dasharray="8,4" marker-end="url(#aRed)"/>
+  <!-- kyverno -> AKS pod (blue admitted, exempt) -->
+  <path d="M 495,300 L 665,300" stroke="#0078D4" stroke-width="3" fill="none" marker-end="url(#aBlue)"/>
+  <text x="580" y="290" font-family="Arial" font-size="10" font-weight="bold" text-anchor="middle" fill="#0078D4">exempt ns</text>
+  <!-- vulnerable pod -> falco (amber detect) -->
+  <path d="M 760,382 L 760,506" stroke="#FFB900" stroke-width="3" fill="none" marker-end="url(#aAmber)"/>
+  <text x="820" y="450" font-family="Arial" font-size="10" font-weight="bold" text-anchor="middle" fill="#B37E00">syscalls</text>
+  <!-- falco -> log analytics (amber) -->
+  <path d="M 875,560 L 1165,560" stroke="#FFB900" stroke-width="3" fill="none" marker-end="url(#aAmber)"/>
+  <!-- AKS control plane -> defender (teal) -->
+  <path d="M 1120,300 L 1165,310" stroke="#008272" stroke-width="3" fill="none" marker-end="url(#aTeal)"/>
+  <!-- defender -> log analytics (teal) -->
+  <path d="M 1270,378 L 1270,516" stroke="#008272" stroke-width="3" fill="none" marker-end="url(#aTeal)"/>
+
+  <!-- Layer labels -->
+  <text x="400" y="410" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle" fill="#0078D4">1. Prevent</text>
+  <text x="760" y="640" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle" fill="#B37E00">2. Detect</text>
+  <text x="1270" y="640" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle" fill="#008272">3. Cloud</text>
+
+  <!-- Bottom annotation -->
+  <text x="700" y="808" font-family="Arial" font-size="12" text-anchor="middle" fill="#666">
+    Terraform-provisioned AKS | Admission: Kyverno (gator/CLI tested) | Runtime: Falco | Cloud: Microsoft Defender for Containers
+  </text>
+</svg>

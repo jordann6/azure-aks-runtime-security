@@ -21,6 +21,8 @@ specific.
 
 ## Architecture
 
+![Azure AKS Runtime Security architecture](docs/architecture-diagram.svg)
+
 Three independent controls on one cluster, each acting at a different layer so an
 attack that evades one is caught by the next.
 
