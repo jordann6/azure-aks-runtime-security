@@ -11,11 +11,15 @@ ATTACK_NS=attack-lab
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "[1/4] Proving admission control: apply the vulnerable pod to 'default'"
-if kubectl apply -f "$here/vulnerable-pod.yaml" -n default 2>&1 | tee /dev/stderr | grep -qi 'denied\|blocked\|not allowed'; then
-  echo "  -> Kyverno correctly BLOCKED the privileged/hostPath/hostPID pod."
-else
-  echo "  -> WARNING: pod was not blocked. Is Kyverno installed and enforcing?"
+# Kyverno returns a non-zero exit when it denies the pod, which is the success
+# case here, so branch on the exit code rather than grepping through a pipe.
+if out=$(kubectl apply -f "$here/vulnerable-pod.yaml" -n default 2>&1); then
+  echo "  -> WARNING: pod was NOT blocked. Is Kyverno installed and enforcing?"
+  echo "$out"
   kubectl delete pod "$POD" -n default --ignore-not-found
+else
+  echo "$out" | sed 's/^/    /'
+  echo "  -> Kyverno correctly BLOCKED the privileged/hostPath/hostPID pod."
 fi
 
 echo "[2/4] Creating an exempt namespace to host the runtime demo"
@@ -37,9 +41,9 @@ echo "[4/4] Executing attack techniques"
 run "T1059 Terminal shell in container"           "bash -c 'echo shell-spawned'"
 run "T1552 Read /etc/shadow (credential access)"  "cat /etc/shadow || true"
 run "T1552 Read service account token"            "cat /var/run/secrets/kubernetes.io/serviceaccount/token 2>/dev/null || echo no-token"
-run "T1611 Container escape via host mount"       "ls /host/etc >/dev/null && echo host-fs-reachable"
+run "T1611 Container escape via host mount"       "mount --bind /host/etc /mnt 2>/dev/null; ls /host/etc >/dev/null && echo host-fs-reachable"
 run "T1105 Drop and execute new binary"           "cp /bin/echo /tmp/dropped && /tmp/dropped executed"
-run "T1552.005 Reach Azure IMDS"                  "curl -s -m 3 -H Metadata:true 'http://169.254.169.254/metadata/instance?api-version=2021-02-01' >/dev/null || true"
+run "T1552.005 Reach Azure IMDS"                  "bash -c 'timeout 3 bash -c \"exec 3<>/dev/tcp/169.254.169.254/80 && echo reached-imds\"' 2>/dev/null || true"
 
 sleep 3
 kill "$tail_pid" 2>/dev/null || true

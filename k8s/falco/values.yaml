@@ -11,11 +11,14 @@ falco:
   priority: notice
 
 collectors:
-  containerd:
-    enabled: true
-    socket: /run/containerd/containerd.sock
-  docker:
-    enabled: false
+  # AKS nodes run containerd; the chart auto-detects the CRI socket.
+  containerEngine:
+    engines:
+      containerd:
+        enabled: true
+        sockets: ["/run/containerd/containerd.sock"]
+      docker:
+        enabled: false
 
 customRules:
   custom-rules.yaml: |-

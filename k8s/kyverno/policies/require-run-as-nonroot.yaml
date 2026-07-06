@@ -20,7 +20,7 @@ spec:
       exclude:
         any:
           - resources:
-              namespaces: ["kube-system", "gatekeeper-system", "falco", "kyverno"]
+              namespaces: ["kube-system", "gatekeeper-system", "falco", "kyverno", "attack-lab"]
       validate:
         message: "Containers must set securityContext.runAsNonRoot to true."
         anyPattern:
