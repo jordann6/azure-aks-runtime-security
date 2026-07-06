@@ -41,7 +41,7 @@ jobs:
       - name: Install Kyverno CLI
         run: |
           VERSION=v1.13.4
-          curl -sSL "https://github.com/kyverno/kyverno/releases/download/${VERSION}/kyverno-cli_${VERSION}_linux_amd64.tar.gz" \
+          curl -sSL "https://github.com/kyverno/kyverno/releases/download/${VERSION}/kyverno-cli_${VERSION}_linux_x86_64.tar.gz" \
             | tar -xz kyverno
           sudo mv kyverno /usr/local/bin/
       - name: Run policy unit tests
