@@ -1,5 +1,7 @@
 # Azure AKS Runtime Security
 
+[![Security Scans](https://github.com/jordann6/azure-aks-runtime-security/actions/workflows/security-scan.yml/badge.svg)](https://github.com/jordann6/azure-aks-runtime-security/actions/workflows/security-scan.yml)
+
 Defense in depth for a running AKS cluster: admission control, runtime threat
 detection, and cloud-native container security layered on one cluster, with the
 attacks that each layer stops or catches scripted so the whole thing is
