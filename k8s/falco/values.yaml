@@ -1,0 +1,97 @@
+# Falco Helm values for AKS. modern_ebpf needs no kernel headers, so it works on
+# the stock Azure Linux / Ubuntu AKS node images. The custom rules mirror the
+# runtime attack scenarios the lab drives and are tagged with MITRE ATT&CK IDs so
+# alerts line up with the Navigator layer in docs/.
+driver:
+  kind: modern_ebpf
+
+falco:
+  json_output: true
+  json_include_output_property: true
+  priority: notice
+
+collectors:
+  containerd:
+    enabled: true
+    socket: /run/containerd/containerd.sock
+  docker:
+    enabled: false
+
+customRules:
+  custom-rules.yaml: |-
+    - rule: Terminal Shell in Container
+      desc: Detect an interactive shell opened inside a container
+      condition: >
+        spawned_process and container and
+        proc.name in (bash, sh, zsh, dash, ash)
+      output: >
+        Shell opened in container
+        (user=%user.name container=%container.name
+        shell=%proc.name parent=%proc.pname
+        cmdline=%proc.cmdline image=%container.image.repository)
+      priority: WARNING
+      tags: [container, shell, mitre_execution, T1059]
+
+    - rule: Read Sensitive File in Container
+      desc: Detect reading of sensitive credential files inside containers
+      condition: >
+        open_read and container and
+        (fd.name startswith /etc/shadow or
+         fd.name startswith /etc/passwd or
+         fd.name startswith /run/secrets or
+         fd.name startswith /var/run/secrets)
+      output: >
+        Sensitive file read in container
+        (user=%user.name container=%container.name
+        file=%fd.name image=%container.image.repository)
+      priority: WARNING
+      tags: [container, filesystem, mitre_credential_access, T1552]
+
+    - rule: Container Escape via Mount
+      desc: Detect attempts to mount or access host paths from a container
+      condition: >
+        spawned_process and container and
+        proc.name = mount and
+        (proc.args contains "/etc" or
+         proc.args contains "/var/run" or
+         proc.args contains "/proc" or
+         proc.args contains "/host")
+      output: >
+        Container escape attempt via mount
+        (user=%user.name container=%container.name
+        command=%proc.cmdline image=%container.image.repository)
+      priority: CRITICAL
+      tags: [container, escape, mitre_privilege_escalation, T1611]
+
+    - rule: Drop and Execute New Binary in Container
+      desc: Detect a newly written file being executed inside a container
+      condition: >
+        spawned_process and container and
+        proc.is_exe_upper_layer = true
+      output: >
+        New binary dropped and executed in container
+        (user=%user.name container=%container.name
+        exe=%proc.exepath cmdline=%proc.cmdline image=%container.image.repository)
+      priority: WARNING
+      tags: [container, process, mitre_execution, T1105]
+
+    - rule: Contact Cloud Metadata Service from Container
+      desc: Detect a container reaching the Azure IMDS endpoint (credential theft)
+      condition: >
+        outbound and container and
+        fd.sip = "169.254.169.254"
+      output: >
+        Container contacted Azure Instance Metadata Service
+        (user=%user.name container=%container.name
+        connection=%fd.name image=%container.image.repository)
+      priority: WARNING
+      tags: [container, network, mitre_credential_access, T1552.005]
+
+falcosidekick:
+  enabled: true
+  config:
+    # Point this at a Log Analytics HTTP Data Collector / webhook to forward
+    # alerts to Azure Monitor for correlation with Defender for Containers.
+    webhook:
+      address: ""
+      minimumpriority: warning

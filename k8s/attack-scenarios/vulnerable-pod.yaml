@@ -1,0 +1,27 @@
+# Deliberately unsafe pod used only to demonstrate runtime detection.
+# It can only be created in a namespace excluded from the Kyverno policies (the
+# runtime-attack script uses a dedicated namespace), which itself proves the
+# admission controls work: apply this to `default` and Kyverno rejects it.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: vulnerable-app
+  labels:
+    app: vulnerable-app
+    scenario: runtime-attacks
+spec:
+  hostPID: true
+  containers:
+    - name: vulnerable-app
+      image: ubuntu:22.04
+      command: ["sleep", "infinity"]
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - name: host-fs
+          mountPath: /host
+  volumes:
+    - name: host-fs
+      hostPath:
+        path: /
+        type: Directory

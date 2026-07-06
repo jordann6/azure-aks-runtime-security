@@ -1,0 +1,65 @@
+# Kyverno CLI test suite. Runs the admission policies against known-good and
+# known-bad pods offline, with no cluster required:
+#   kyverno test k8s/kyverno/tests/
+# This is the detection-as-code gate that runs the policies through CI before
+# they are ever enforced on a live cluster.
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: runtime-security-policies
+policies:
+  - ../policies/disallow-privileged.yaml
+  - ../policies/require-run-as-nonroot.yaml
+  - ../policies/disallow-host-namespaces.yaml
+  - ../policies/disallow-host-path.yaml
+resources:
+  - resources/privileged-pod.yaml
+  - resources/root-pod.yaml
+  - resources/hostnamespace-pod.yaml
+  - resources/hostpath-pod.yaml
+  - resources/compliant-pod.yaml
+results:
+  # disallow-privileged-containers
+  - policy: disallow-privileged-containers
+    rule: privileged-containers
+    resources: [privileged-pod]
+    kind: Pod
+    result: fail
+  - policy: disallow-privileged-containers
+    rule: privileged-containers
+    resources: [compliant-pod]
+    kind: Pod
+    result: pass
+  # require-run-as-nonroot
+  - policy: require-run-as-nonroot
+    rule: run-as-non-root
+    resources: [root-pod]
+    kind: Pod
+    result: fail
+  - policy: require-run-as-nonroot
+    rule: run-as-non-root
+    resources: [compliant-pod]
+    kind: Pod
+    result: pass
+  # disallow-host-namespaces
+  - policy: disallow-host-namespaces
+    rule: host-namespaces
+    resources: [hostnamespace-pod]
+    kind: Pod
+    result: fail
+  - policy: disallow-host-namespaces
+    rule: host-namespaces
+    resources: [compliant-pod]
+    kind: Pod
+    result: pass
+  # disallow-host-path
+  - policy: disallow-host-path
+    rule: host-path
+    resources: [hostpath-pod]
+    kind: Pod
+    result: fail
+  - policy: disallow-host-path
+    rule: host-path
+    resources: [compliant-pod]
+    kind: Pod
+    result: pass

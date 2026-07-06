@@ -1,0 +1,11 @@
+# Copy to terraform.tfvars and adjust. terraform.tfvars is gitignored.
+project_name       = "aks-runtime-sec"
+location           = "eastus"
+cluster_name       = "aks-runtime-security"
+kubernetes_version = "1.30"
+node_count         = 2
+node_vm_size       = "Standard_B2s"
+
+# Defender for Containers is a subscription-level plan. Set to false if another
+# workload in the subscription already manages the Containers pricing tier.
+enable_defender_for_containers = true

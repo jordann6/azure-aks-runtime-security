@@ -1,0 +1,23 @@
+{
+  "name": "Azure AKS Runtime Security — Coverage",
+  "versions": {
+    "attack": "14",
+    "navigator": "4.9.1",
+    "layer": "4.5"
+  },
+  "domain": "enterprise-attack",
+  "description": "MITRE ATT&CK techniques exercised by the runtime attack scenarios (k8s/attack-scenarios/) and detected by Falco / Defender for Containers, plus the admission techniques blocked by Kyverno. Import at https://mitre-attack.github.io/attack-navigator/.",
+  "gradient": {
+    "colors": ["#ffe766", "#ff6666"],
+    "minValue": 0,
+    "maxValue": 1
+  },
+  "techniques": [
+    { "techniqueID": "T1610", "tactic": "defense-evasion", "score": 1, "comment": "Deploy container: privileged/hostPath pod — blocked at admission by Kyverno" },
+    { "techniqueID": "T1059", "tactic": "execution", "score": 1, "comment": "Terminal shell in container — Falco: Terminal Shell in Container" },
+    { "techniqueID": "T1552.001", "tactic": "credential-access", "score": 1, "comment": "Read /etc/shadow, service account token — Falco: Read Sensitive File in Container" },
+    { "techniqueID": "T1552.005", "tactic": "credential-access", "score": 1, "color": "#e6550d", "comment": "Reach Azure IMDS (169.254.169.254) — Falco: Contact Cloud Metadata Service" },
+    { "techniqueID": "T1611", "tactic": "privilege-escalation", "score": 1, "color": "#de2d26", "comment": "Container escape via host mount — Falco: Container Escape via Mount (CRITICAL); prevented by Kyverno disallow-host-path" },
+    { "techniqueID": "T1105", "tactic": "command-and-control", "score": 1, "comment": "Drop and execute new binary — Falco: Drop and Execute New Binary in Container" }
+  ]
+}
